@@ -1,22 +1,25 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:pokedex/models/pokemon.dart';
+import 'dart:convert';
 
-class PokedexApi {
-  static const String _baseUrl =
+import 'package:dio/dio.dart';
+
+import 'package:pokedex/model/pokemon_model.dart';
+
+class PokeApi {
+  static const String _url =
       'https://raw.githubusercontent.com/Biuni/PokemonGO-Pokedex/master/pokedex.json';
 
   static Future<List<PokemonModel>> getPokemonData() async {
-    List<PokemonModel> pokemonList = [];
+    List<PokemonModel> list = [];
 
-    await Dio().get(_baseUrl).then((value) {
-      value.data['pokemon'].forEach((pokemon) {
-        pokemonList.add(PokemonModel.fromJson(pokemon));
-      });
-    });
+    var result = await Dio().get(_url);
+    var pokeList = jsonDecode(result.data)['pokemon'];
 
-    debugPrint('pokemonList: $pokemonList');
+    if (pokeList is List) {
+      list = pokeList.map((e) => PokemonModel.fromJson(e)).toList();
+    } else {
+      return [];
+    }
 
-    return pokemonList;
+    return list;
   }
 }
